@@ -1,0 +1,49 @@
+#######################################
+# Syntax Coloring Map For LED_Tile
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LED_Tile	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+end	KEYWORD2
+write	KEYWORD2
+read	KEYWORD2
+clear	KEYWORD2
+set_threshold	KEYWORD2
+read_raw	KEYWORD2
+read_raw_max	KEYWORD2
+
+pat	KEYWORD2
+pat_in	KEYWORD2
+mode	KEYWORD2
+th	KEYWORD2
+
+com_write	KEYWORD2
+com_available	KEYWORD2
+com_read	KEYWORD2
+com_process	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+LT_DRAW_MODE_NONE	LITERAL1
+LT_DRAW_MODE_DRAW	LITERAL1
+LT_DRAW_MODE_TOGGLE	LITERAL1
+LT_TYPE_NANO 	LITERAL1
+LT_TYPE_MEGA 	LITERAL1
+
+COMU		LITERAL1
+COMD		LITERAL1
+COML		LITERAL1
+COMR		LITERAL1
+

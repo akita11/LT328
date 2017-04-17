@@ -1,8 +1,10 @@
 # LED Tile328の関連ファイル。
 
-by akita11(akita@ifdl.jp)
+ver1.00 by akita11(akita@ifdl.jp)
 
 ## インストールと動作チェック
+
+詳しい使い方は LT328man_v100.pdf を参照してください。以下は概要です。
 
 1. ファイルをzipでダウンロード(右のほうの緑の"clone or Download"から)
 2. ArduinoIDEから、スケッチ→ライブラリをインクルード→ZIP形式のライブラリをインストール、を選び、1.でダウンロードしたzipファイルを選ぶ。ライブラリに"LT328v2"が追加されていることを確認する

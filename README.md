@@ -16,3 +16,7 @@ ver1.00 by akita11(akita@ifdl.jp)
 ## ライブラリ関数の使い方
 
 こちらを参照: http://ifdl.jp/akita/lt/
+
+## お問い合わせ
+
+使い方などについてのお問い合わせは、akita[at]ifdl.jpまでご連絡ください。

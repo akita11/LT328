@@ -4,6 +4,7 @@ LT lt = LT();
 
 int ax, ay, az;
 byte pu, pd, pl, pr;
+int ax0, ay0, az0;
 
 #define TH_ACC 25
 
@@ -14,10 +15,8 @@ byte bit_reverse(byte x)
   return(y);
 }
 
-void setup()
+void init_pattern()
 {
-  lt.begin(1);
-
   lt.write(3, 0x18); lt.write(4, 0x18);
   delay(100);
   lt.write(2, 0x3c); lt.write(3, 0x24); lt.write(4, 0x24); lt.write(5, 0x3c);
@@ -27,15 +26,19 @@ void setup()
   lt.write(0, 0xff); for (int y = 1; y < 7; y++) lt.write(y, 0x81); lt.write(7, 0xff);
   delay(100);
   lt.clear();  
-//  delay(1000);
-//  for (int y = 0; y < 8; y++) lt.write(y, 0xff);
-//  delay(100);
-//  lt.clear();
+}
 
+void setup()
+{
+  lt.begin(1);
+
+  init_pattern();
+  ax0 = lt.get_acc(0);
+  ay0 = lt.get_acc(1);
+  
   lt.mode = LT_DRAW_MODE_DRAW;
 
-//  Serial.begin(9600);
-//  Serial.println("Ready");
+  //  Serial.begin(9600); Serial.println("Ready");
 }
 
 //           (0)...(7)
@@ -47,9 +50,9 @@ void setup()
 void loop()
 {
   int i;
-  ax = lt.get_acc(0);
-  ay = lt.get_acc(1);
-
+  ax = lt.get_acc(0) - ax0;
+  ay = lt.get_acc(1) - ay0;
+  //  Serial.print(ax); Serial.print(' '); Serial.print(ax0); Serial.print(' | '); Serial.print(ay); Serial.print(' '); Serial.println(ay0);
   if (ay > TH_ACC){
     // to left
     pl = 0x00; for (i = 0; i < 8; i++) if (lt.pat[i] & 0x01) pl |= 1 << (7-i);
@@ -92,4 +95,11 @@ void loop()
   if (lt.com_available(COML) > 0) pl = bit_reverse(lt.com_read(COML));
   if (lt.com_available(COMR) > 0) pr = bit_reverse(lt.com_read(COMR));
   delay(100);
+
+  if (read_sw() == 1){
+    init_pattern();
+    ax0 = lt.get_acc(0);
+    ay0 = lt.get_acc(1);
+    while(read_sw() == 1) delay(10);
+  }
 }

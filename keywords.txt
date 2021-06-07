@@ -20,6 +20,7 @@ clear	KEYWORD2
 set_threshold	KEYWORD2
 read_raw	KEYWORD2
 read_raw_max	KEYWORD2
+read_sw	KEYWORD2
 
 pat	KEYWORD2
 pat_in	KEYWORD2

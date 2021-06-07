@@ -108,6 +108,9 @@ void LT::begin(uint8_t f)
   }
   com_operation = f;
 
+  //  pinMode(10, INPUT_PULLUP); // for SW
+  DDRB |= 0x04; PORTB |= 0x04;
+  
   LT::active_object = this;
 
   TCCR1A = 0; // clear control register A 
@@ -134,16 +137,24 @@ void LT::begin(uint8_t f)
 
   set_threshold(90); // default threshold
   i2c_setup();
-  i2c_sendT();
 #ifdef USE_ACC_MMA7660
-  i2c_write(0x4c << 1); // slave address=0x4c / write
+  // initilization of MMA7660
+  i2c_sendT();
+  i2c_write(ACC_ADDR << 1);
   i2c_write(0x07); i2c_write(0x01); // active mode
-  //  i2c_write(0x07); i2c_write(0x09); // active mode
-#else
-  i2c_write(0x1d << 1); // slave address=0x1d / write
-  i2c_write(0x16); i2c_write(0x25);
-#endif
   i2c_sendP();
+#else
+  // initialization of ADXL345
+  i2c_sendT();
+  i2c_write(ACC_ADDR << 1);
+  //  i2c_write(0x16); i2c_write(0x25);
+  i2c_write(0x2d); i2c_write(0x08); // Measure mode
+  i2c_sendP();
+  i2c_sendT();
+  i2c_write(ACC_ADDR << 1);
+  i2c_write(0x31); i2c_write(0x04); // +-2g, MSB-adjusted
+  i2c_sendP();
+#endif
 }
 
 void LT::end(void)
@@ -484,25 +495,40 @@ uint8_t LT::com_read_pin(uint8_t dir)
 int LT::get_acc(uint8_t axis)
 {
   int d = 0;
+ 
   if (axis >= 0 && axis <= 2){
     int f = 0;
     while(f == 0){
       i2c_sendT();
-      i2c_write(0x4c << 1);
+      i2c_write(ACC_ADDR << 1);
+#ifdef USE_ACC_MMA7660
       i2c_write(0x00 + axis);
+#else
+      i2c_write(0x33 + (axis << 1));
+#endif
       i2c_sendT();
-      i2c_write(0x4c << 1 | 0x01);
-      d = i2c_read();
+      i2c_write(ACC_ADDR << 1 | 0x01);
+      d = i2c_read(1);
+      
+#ifdef USE_ACC_MMA7660
       if ((d & 0x40) == 0) f = 1;
+#else
+      f = 1;
+#endif
       i2c_sendP();
+      f = 1;
     }
+#ifdef USE_ACC_MMA7660
     d = (d << 2) & 0xfc;
-    if (d & 0x80) d = -((~d & 0xff) + 1);
-      //   d += 0x80;
+#endif
   }
+  if (d & 0x80) d = -((~d & 0xff) + 1);
+#ifdef USE_ACC_MMA7660
+#else
+  d = -d; // invert sign for ADXL345
+#endif
   return(d);
 }
-
 
 #define BM_SCL (1 << 6)
 #define BM_SDA (1 << 7)
@@ -521,10 +547,12 @@ int LT::get_acc(uint8_t axis)
 void LT::setSDA(uint8_t x)
 {
   if (x == 0){
+    // drive 0 for '0'
     PORTB &= ~BM_SDA;
     DDRB |= BM_SDA;
   }
   else{
+    // Z with pull-up for '1'
     PORTB |= BM_SDA;
     DDRB &= ~BM_SDA;
   }
@@ -591,7 +619,7 @@ uint8_t LT::i2c_write(uint8_t d)
   return(i);
 }
 
-uint8_t LT::i2c_read()
+uint8_t LT::i2c_read(uint8_t ack)
 {
   int i;
   uint8_t d = 0;
@@ -599,14 +627,15 @@ uint8_t LT::i2c_read()
   for (i = 0; i < 8; i++){
     d = d << 1;
     if (readSDA() == 1) d |= 0x01;
-    i2c_delay();
     setSCL(1);
     i2c_delay();
     setSCL(0);
+    i2c_delay();
   }
   SDA_OUT();
   //  setSDA(0); // ACK
-  setSDA(1); // NAK
+  //  setSDA(1); // NAK
+  setSDA(ack);
   i2c_delay();
   setSCL(1);
   i2c_delay();
@@ -614,4 +643,10 @@ uint8_t LT::i2c_read()
   i2c_delay();
   SDA_IN();
   return(d);
+}
+
+int LT::read_sw()
+{
+  if ((PINB & 0x04) == 0) return(1);
+  else return(0);
 }

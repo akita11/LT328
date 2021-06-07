@@ -14,6 +14,9 @@
 #ifndef LT328V2_H
 #define LT328V2_H
 
+// uncommenct "USE_ACC_MMA7660" for LT328v3 (using ADXL345)
+//#define USE_ACC_MMA7660 // use Freescale's MMA7760 as accelerometer
+
 #include <inttypes.h>
 
 // Dot matrix LED: OSL641501-BRA] (Akizuki's I-05163)
@@ -25,8 +28,6 @@
 //   (0,0) ... (7,0) : pat[0](LSB=(0,0), MSB=(7,0)
 //   ...       ...     ...
 //   (0,7) ... (7,7) : pat[7](LSB=(0,0), MSB=(7,7)
-
-#define USE_ACC_MMA7660 // use Freescale's MMA7760 as accelerometer
 
 #define LT_DRAW_MODE_NONE    0
 #define LT_DRAW_MODE_DRAW    1
@@ -44,6 +45,14 @@
 #define COM_TX 0x01
 #define COM_RX 0x02
 #define COM_RXBUF 16
+
+
+#ifdef USE_ACC_MMA7660
+#define ACC_ADDR 0x4c
+#else
+//#define ACC_ADDR 0x1d
+#define ACC_ADDR 0x53
+#endif
 
 class LT
 {
@@ -69,7 +78,7 @@ private:
   void i2c_sendT();
   void i2c_sendP();
   uint8_t i2c_write(uint8_t d);
-  uint8_t i2c_read();
+  uint8_t i2c_read(uint8_t ack);
   void setSDA(uint8_t x);
   void setSCL(uint8_t x);
   uint8_t readSDA();
@@ -104,6 +113,8 @@ public:
   void clear(void); // clear pattern
 
   int get_acc(uint8_t axis);
+
+  int read_sw();  
 
   static LT *active_object;
 

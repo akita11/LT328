@@ -1,7 +1,5 @@
 # LED Tile328の関連ファイル。
 
-ver1.00 by akita11(akita@ifdl.jp)
-
 ## インストールと動作チェック
 
 詳しい使い方は LT328man_v100.pdf を参照してください。以下は概要です。
@@ -19,4 +17,4 @@ ver1.00 by akita11(akita@ifdl.jp)
 
 ## お問い合わせ
 
-使い方などについてのお問い合わせは、akita[at]ifdl.jpまでご連絡ください。
+使い方などについてのお問い合わせは、Junichi Akita (akita[at]ifdl.jp / @akita11)までご連絡ください。
